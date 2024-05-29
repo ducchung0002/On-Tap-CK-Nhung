@@ -6,7 +6,7 @@ import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 connected = set()
 # LED
-LED_PINS = [2, 3, 4]
+LED_PINS = {'red': 2, 'green': 3, 'blue': 4}
 LED_STATE = {'red': 0, 'green': 0, 'blue': 0}
 
 for pin in LED_PINS:
@@ -23,7 +23,7 @@ async def server(websocket, path):
         while True:
             color = await websocket.recv()
             LED_STATE[color] = 1 - LED_STATE[color]
-            GPIO.output(LED_PINS[index], LED_STATE[color])
+            GPIO.output(LED_PINS[color], LED_STATE[color])
             # broadcast to all clients
             await broadcast(json.dumps(LED_STATE))
     finally:
