@@ -1,0 +1,9 @@
+1. Thư viện RPi.GPIO
+
+import RPi.GPIO as GPIO
+
+set up:
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(PIN, GPIO.IN)
+GPIO.output()
+GPIO.input()

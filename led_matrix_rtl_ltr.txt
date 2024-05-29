@@ -1,0 +1,129 @@
+/*
+Model 1088AS
+pin: pin 9 -> logo 1088AS -> pin 16
+đối diện pin 9: pin 8
+đối diện pin 16: pin 1
+
+            CỘT 8 7 6 5 4 3 2 1
+             ┏━━━━━━━━━━━━━━━━━━┓
+DÒNG 1 PIN 1 ┃                  ┃ 16
+DÒNG 2 PIN 2 ┃                  ┃ 15
+DÒNG 3 PIN 3 ┃                  ┃ 14
+DÒNG 4 PIN 4 ┃                  ┃ 13
+DÒNG 5 PIN 5 ┃                  ┃ 12
+DÒNG 6 PIN 6 ┃                  ┃ 11
+DÒNG 7 PIN 7 ┃                  ┃ 10
+DÒNG 8 PIN 8 ┃                  ┃ 9
+             ┗━━━━━━━━━━━━━━━━━━┛
+ROW: anode
+COL: cathode
+
+pin  1: C8                pin 16: C6
+pin  2: R5                pin 15: C3
+pin  3: R3                pin 14: R4
+pin  4: C5                pin 13: C1
+pin  5: R8                pin 12: R6
+pin  6: C7                pin 11: R7
+pin  7: R2                pin 10: C2
+pin  8: R1                pin  9: C4
+
+LẮP MẠCH DUYỆT CỘT
+// LSBFIRST QH->QA
+// MSBFIRST QA->QH
+shift register 74HC595:
+                             ┏━━━━━━━━━╰╯━━━━━━━━━┓
+pin  7: R2   <-- QB        1 ┃ O                  ┃  16             POWER --> 5V
+pin  3: R3   <-- QC        2 ┃                    ┃  15                QA --> pin  8: R1
+pin 14: R4   <-- QD        3 ┃                    ┃  14       Serial Data --> Arduino D2
+pin  2: R5   <-- QE        4 ┃       74HC595      ┃  13     Output Enable --> GND
+pin 12: R6   <-- QF        5 ┃                    ┃  12             Latch --> Arduino D4
+pin 11: R7   <-- QG        6 ┃                    ┃  11             Clock --> Arduino D3
+pin  5: R8   <-- QH        7 ┃                    ┃  10      Master Reset --> 5V
+GND          <-- GND       8 ┃                    ┃  9     QK* Serial out --> leave it floating
+                             ┗━━━━━━━━━━━━━━━━━━━━┛
+
+D5  --> resistor --> pin  1: C8
+D6  --> resistor --> pin  6: C7
+D7  --> resistor --> pin 16: C6
+D8  --> resistor --> pin  4: C5
+D9  --> resistor --> pin  9: C4
+D10 --> resistor --> pin 15: C3
+D11 --> resistor --> pin 10: C2
+D12 --> resistor --> pin 13: C1
+
+cơ chế hoạt động 
+https://lastminuteengineers.com/wp-content/uploads/arduino/74HC595-Shift-Register-Working.gif
+*/
+
+
+// viết mã hex trên xuống => LSBFIRST
+byte char_C[8] = { 0x00, 0x3e, 0x41, 0x41, 0x41, 0x22, 0x00, 0x00 };
+byte char_H[8] = { 0x00, 0x7f, 0x08, 0x08, 0x08, 0x7f, 0x00, 0x00 };
+//
+
+const int SDA_PIN = 2;
+const int SCL_PIN = 3;
+const int LATCH_PIN = 4;
+const int COLS_PIN[] = { 5, 6, 7, 8, 9, 10, 11, 12 };
+
+#define NO_CHARS 5
+const byte* SEQUENCE[8] = { char_C, char_H, char_U, char_N, char_G };
+
+void displayChar(byte my_char[]); // display one character
+void displaySequence(); // display every char in string
+void shiftSequence(); // shift string left to right/right to left
+
+void setup() {
+  pinMode(SDA_PIN, OUTPUT);
+  pinMode(SCL_PIN, OUTPUT);
+  pinMode(LATCH_PIN, OUTPUT);
+  for (int p : COLS_PIN) {
+    pinMode(p, OUTPUT);
+  }
+}
+
+void loop() {
+  displaySequence();
+  shiftSequence();
+}
+
+void shiftSequence() {
+    byte window[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    displayChar(window); // display blank
+    // for (int it = NO_CHARS * 8 - 1; it >= 0; it--) // left to right
+    for (int it = 0; it < NO_CHARS * 8; it++) { //right to left
+        int idx = it / 8;
+        int offset = it % 8;
+        // shift window
+        // for (int j = 7; j > 0; j--) window[j] = window[j - 1]; // left to right
+        for (int j = 0; j < 8; j++) window[j] = window[j + 1]; // right to left
+        // assign last value to current character column
+        // window[0] = SEQUENCE[idx][offset]; // left to right
+        window[7] = SEQUENCE[idx][offset]; // right to left
+        for (int j = 0; j < 50; j++)
+            displayChar(window);
+    }
+}
+
+void displaySequence() {
+    for (int i = 0; i < NO_CHARS; i++) {
+        for (int j=0; j<50; j++)
+            displayChar(SEQUENCE[i]);
+    }
+}
+
+void displayChar(byte my_char[]) {
+    for (int it = 0; it < 8; it++) {
+      digitalWrite(COLS_PIN[it], LOW); // cathode
+      shiftDisplay(my_char[it]);
+      delay(1);
+      digitalWrite(COLS_PIN[it], HIGH);
+      shiftDisplay(0);
+    }
+}
+
+void shiftDisplay(byte data) {
+    digitalWrite(LATCH_PIN, LOW);
+    shiftOut(SDA_PIN, SCL_PIN, LSBFIRST, data);
+    digitalWrite(LATCH_PIN, HIGH);
+}

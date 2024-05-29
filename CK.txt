@@ -1,0 +1,23 @@
+chương 1
+chương tổng quan 
+
+câu 1 (2đ)
+so sánh tổng quan thông số arduino vs rasperripy
+
+câu 2 (4đ)
+led ma trận
+cho hình bất kỳ
+mắc mạch như thế nào
+duyệt hàng trái phải trên dưới
+
+câu 3 (4d)
+GPIO
+dùng chân GPIO của rasp để duyệt led và button
+duyệt led nút nhấn
+
+face detection (ko có photobooth) -> nhan dien xong dung de lam gi nua 
+viết python trên rasperripy
+
+tạo webserver để duyệt led và bật tắt đèn
+viết cả html js
+weblamp
