@@ -7,3 +7,17 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(PIN, GPIO.IN)
 GPIO.output()
 GPIO.input()
+
+
+2. weblamp
+javascript:
+
+let websocket = new WebSocket('ws://192.168.1.9:6789')
+
+// receive message from server
+socket.onmessage=(event) => {
+	message = JSON.parse(event.data)
+}
+
+// send message to server
+JSON.stringify

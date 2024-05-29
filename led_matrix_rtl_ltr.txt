@@ -57,6 +57,7 @@ https://lastminuteengineers.com/wp-content/uploads/arduino/74HC595-Shift-Registe
 
 
 // viết mã hex trên xuống => LSBFIRST
+// Xem cách viết ở file char.xlsx
 byte char_C[8] = { 0x00, 0x3e, 0x41, 0x41, 0x41, 0x22, 0x00, 0x00 };
 byte char_H[8] = { 0x00, 0x7f, 0x08, 0x08, 0x08, 0x7f, 0x00, 0x00 };
 //

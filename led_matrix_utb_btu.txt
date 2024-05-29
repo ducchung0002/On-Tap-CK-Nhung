@@ -55,6 +55,7 @@ cơ chế hoạt động
 https://lastminuteengineers.com/wp-content/uploads/arduino/74HC595-Shift-Register-Working.gif
 */
 // viết mã hex trái phải, điểm sáng là 0, điểm tối là 1 => MSBFIRST
+// Xem cách viết ở file char.xlsx
 byte char_C[8] = { 0xff, 0xc7, 0xbb, 0xbf, 0xbf, 0xbf, 0xbb, 0xc7 };
 byte char_H[8] = { .., .., .., .., .., .., .., .. };
 //
